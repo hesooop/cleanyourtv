@@ -1,23 +1,33 @@
-name: Build Android 6.0 Launcher APK
-on: [workflow_dispatch, push]
+name: Build APK for Letv X4-50
+
+on:
+  push:
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - name: Lower minSdk to 23 for Android 6.0 and Build APK
-        working-directory: ./launcher
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build APK with Gradle
         run: |
-          sed -i 's/minSdk[Version]* [0-9]*/minSdk 23/g' app/build.gradle
+          cd launcher
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --stacktrace
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: cleanyourtv-android6-apk
+          name: cleanyourtv-x450-apk
           path: launcher/app/build/outputs/apk/release/*.apk
